@@ -13,6 +13,7 @@ import requests
 
 from divante_env import github_token, github_username
 import divante_get_repos
+import get_repo_names
 
 # TODO: Make a github personal access token.
 #     1. Go here and generate a personal access token https://github.com/settings/tokens
@@ -21,7 +22,8 @@ import divante_get_repos
 # TODO: Add your github username to your engithub_tokenv.py file under the variable `github_username`
 # TODO: Add more repositories to the `REPOS` list below.
 
-REPOS = []
+REPOS = ['loutfialiluch/HealthCare']
+
  
 
 headers = {"Authorization": f"token {github_token}", "User-Agent": github_username}
