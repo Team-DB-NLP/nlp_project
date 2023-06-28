@@ -3,11 +3,11 @@ nlp project for codeup.
 
 ## Project Description
 
-* 
+* To explore GitHub README'S in a particular subject subject area and build a model to predict programming language used.
 
 ## Project Goals
 
-* 
+* Acquire 100 README files
 
 * 
 
