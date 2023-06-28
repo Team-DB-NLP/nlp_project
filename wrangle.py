@@ -85,6 +85,31 @@ def split_data(df, target):
     return train, validate, test
 
 
+def get_bows(X_train, X_validate, X_test):
+    cv = CountVectorizer()
+    X_bow = cv.fit_transform(X_train)
+    X_validate_bow = cv.transform(X_validate)
+    X_test_bow = cv.transform(X_test)
+    return X_bow, X_validate_bow, X_test_bow
+
+    
+def get_train(new_df):
+    train, validate, test = split_data(new_df, 'language')
+
+    X_train = train['lemmatized']
+    y_train = train.language
+    X_validate = validate['lemmatized']
+    y_validate = validate.language
+    X_test = test['lemmatized']
+    y_test = test.language
+    X_bow, X_validate_bow, X_test_bow = get_bows(X_train, X_validate, X_test)
+    the_df = super_classification_model(new_df, X_bow,y_train, X_validate_bow, y_validate)
+
+    # (new_df, X_train,y_train, X_validate, y_validate, the_c = 1, neighbors = 20)
+
+    return the_df, X_test_bow, y_test
+    
+
 def get_dataframe():
     new_df = pd.read_csv('giant_df')
     new_df = prepare_data(new_df)
@@ -140,7 +165,7 @@ def super_classification_model(new_df, X_train,y_train, X_validate, y_validate, 
     '''
     Runs classification models based on our best parameters and returns a pandas dataframe
     '''
-    baseline = len(new_df[new_df.language == 'other']) / len(new_df[new_df.language == 'other']) + len(new_df[new_df.language != 'other'])
+    baseline = len(new_df[new_df.language == 'other']) / len(new_df.index)
     the_df = pd.DataFrame(data=[
     {
         'model_train':'baseline',
@@ -179,9 +204,21 @@ def super_classification_model(new_df, X_train,y_train, X_validate, y_validate, 
     return the_df
 
 
-def get_bows(X_train, X_validate, X_test):
-    cv = CountVectorizer()
-    X_bow = cv.fit_transform(X_train)
-    X_validate_bow = cv.transform(X_validate)
-    X_test_bow = cv.transform(X_test)
-    return X_bow, X_validate_bow, X_test_bow
+def chi2_test(train, columns_list):
+    '''
+    Runs a chi2 test on all items in a list of lists and returns a pandas dataframe
+    '''
+    chi_df = pd.DataFrame({'feature': [],
+                    'chi2': [],
+                    'p': [],
+                    'degf':[],
+                    'expected':[]})
+    
+    for iteration, col in enumerate(columns_list):
+        
+        observed = pd.crosstab(train[col[0]], train[col[1]])
+        chi2, p, degf, expected = stats.chi2_contingency(observed)
+
+        chi_df.loc[iteration+1] = [col, chi2, p, degf, expected]
+
+    return chi_df
