@@ -7,10 +7,10 @@ import os
 import time
 import prepare
 import json
-
+import unicodedata
 import pandas as pd
 import numpy as np
-
+import seaborn as sns
 #see the data
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
@@ -124,6 +124,10 @@ def drop_http_words(text):
     return ' '.join(filtered_words)
 
 
+def new_column_counts(the_string):
+        return len(the_string)
+
+
 def prepare_data(new_df):
     # Drop specific rows from the DataFrame
     new_df = new_df.drop([4, 26, 86, 143])
@@ -143,6 +147,7 @@ def prepare_data(new_df):
 
     new_df['language'] = new_df['language'].replace(the_dict)
     new_df['readme_contents'] = new_df['readme_contents'].apply(drop_http_words)
+    
     return new_df
 
 
@@ -158,6 +163,7 @@ def do_everything(codeup_df):
 
     codeup_df['stemmed'] = codeup_df['clean'].apply(prepare.stem)
     codeup_df['lemmatized'] = codeup_df['clean'].apply(prepare.lemmatize)
+    codeup_df['lem_len'] = codeup_df.lemmatized.apply(new_column_counts)
     return codeup_df
 
 
@@ -222,3 +228,116 @@ def chi2_test(train, columns_list):
         chi_df.loc[iteration+1] = [col, chi2, p, degf, expected]
 
     return chi_df
+
+
+def clean(text):
+    '''
+    A simple function to cleanup text data.
+    
+    Args:
+        text (str): The text to be cleaned.
+        
+    Returns:
+        list: A list of lemmatized words after cleaning.
+    '''
+    
+    # basic_clean() function from last lesson:
+    # Normalize text by removing diacritics, encoding to ASCII, decoding to UTF-8, and converting to lowercase
+    text = (unicodedata.normalize('NFKD', text)
+             .encode('ascii', 'ignore')
+             .decode('utf-8', 'ignore')
+             .lower())
+    
+    # Remove punctuation, split text into words
+    words = re.sub(r'[^\w\s]', '', text).split()
+    
+    
+    # lemmatize() function from last lesson:
+    # Initialize WordNet lemmatizer
+    wnl = nltk.stem.WordNetLemmatizer()
+    
+    # Combine standard English stopwords with additional stopwords
+    stopwords = nltk.corpus.stopwords.words('english') 
+    
+    # Lemmatize words and remove stopwords
+    cleaned_words = [wnl.lemmatize(word) for word in words if word not in stopwords]
+    
+    return cleaned_words
+
+
+def all_words_function(new_df):
+    df = new_df
+    other_words = clean(' '.join(df[df.language=="other"]['lemmatized']))
+    Python_words = clean(' '.join(df[df.language=="Python"]['lemmatized']))
+    Java_words = clean(' '.join(df[df.language=="Java"]['lemmatized']))
+    JavaScript_words = clean(' '.join(df[df.language=="JavaScript"]['lemmatized']))
+    HTML_words = clean(' '.join(df[df.language=="HTML"]['lemmatized']))
+
+
+
+
+
+
+    other_words_freq = pd.Series(other_words).value_counts()
+    Python_words_freq = pd.Series(Python_words).value_counts()
+    Java_words_freq = pd.Series(Java_words).value_counts()
+    JavaScript_words_freq = pd.Series(JavaScript_words).value_counts()
+    HTML_words_freq = pd.Series(HTML_words).value_counts()
+
+
+    other_words_df = pd.DataFrame(other_words_freq)
+    Python_words_df = pd.DataFrame(Python_words_freq)
+    Java_words_df = pd.DataFrame(Java_words_freq)
+    JavaScript_words_df = pd.DataFrame(JavaScript_words_freq)
+    HTML_words_df = pd.DataFrame(HTML_words_freq)
+
+    all_words = clean(' '.join(df['lemmatized']))
+    all_freq = pd.Series(all_words).value_counts()
+    all_words_df = pd.DataFrame(all_freq)
+
+    word_counts =pd.concat([other_words_freq,Python_words_freq, Java_words_freq, JavaScript_words_freq,HTML_words_freq, all_freq], axis =1).fillna(0).astype(int)
+
+    
+    word_counts.columns = ['other', 'Python', 'Java', 'JavaScript', 'HTML', 'all']
+    return HTML_words_df, JavaScript_words_df, Java_words_df, Python_words_df, other_words_df, other_words, Python_words, Java_words, JavaScript_words, HTML_words, other_words_freq, Python_words_freq, Java_words_freq, JavaScript_words_freq, HTML_words_freq, word_counts, all_words, all_freq, all_words_df
+
+
+def visual_one(Python_words_df,other_words_df, Java_words_df, JavaScript_words_df, all_words_df, HTML_words_df):
+    one = pd.DataFrame([len(Python_words_df)])
+    two = pd.DataFrame([len(other_words_df)])
+    three = pd.DataFrame([len(Java_words_df)])
+    four = pd.DataFrame([len(JavaScript_words_df)])
+    five = pd.DataFrame([len(all_words_df)])
+
+    six = pd.DataFrame([len(HTML_words_df)])
+
+    master_numbers = pd.concat([one,two,three,four, six, five], axis=1)
+    master_numbers.columns = ['Python','other',  'Java', 'JavaScript', 'HTML','all',]
+    sns.barplot(data = master_numbers)
+    plt.title('Do different programming languages use a different number of unique words?')
+    plt.show()
+
+
+def visual_two(word_counts):
+    (word_counts.sort_values('all', ascending=False)
+    .head(20)
+    .apply(lambda row: row/row['all'], axis=1)
+    .sort_values(by='all')
+    .drop(columns='all')
+
+    .plot.barh(stacked=True, width=1, ec='black')
+    )
+
+
+    plt.title('% of programming language for the most common 20 words')
+    plt.legend(bbox_to_anchor=(1.2, 1.0),loc='upper right')
+    plt.show()
+
+def get_stats_test(train):
+    answer = stats.f_oneway(train['lem_len'][train['language'] == 'other'], 
+                     train['lem_len'][train['language'] == 'Python'], 
+                     train['lem_len'][train['language'] == 'Java'],
+                    train['lem_len'][train['language'] == 'JavaScript'],
+                    train['lem_len'][train['language'] == 'HTML'])
+    
+    return answer
