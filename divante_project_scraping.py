@@ -14,6 +14,7 @@ import requests
 from divante_env import github_token, github_username
 import divante_get_repos
 import get_repo_names
+import random
 
 # TODO: Make a github personal access token.
 #     1. Go here and generate a personal access token https://github.com/settings/tokens
@@ -22,21 +23,27 @@ import get_repo_names
 # TODO: Add your github username to your engithub_tokenv.py file under the variable `github_username`
 # TODO: Add more repositories to the `REPOS` list below.
 
-REPOS = ['loutfialiluch/HealthCare']
+REPOS = get_repo_names.get_names_list()
+
 
  
+def headers_function():
+    the_list = ['pandas', 'apples', 'divante222', 'cobra', 'circle']
+    headers = {"Authorization": f"token {github_token}", "User-Agent": random.choice(the_list)}
+    return headers
 
-headers = {"Authorization": f"token {github_token}", "User-Agent": github_username}
 
-if headers["Authorization"] == "token " or headers["User-Agent"] == "":
-    raise Exception(
-        "You need to follow the instructions marked TODO in this script before trying to use it"
-    )
+# if headers["Authorization"] == "token " or headers["User-Agent"] == "":
+#     raise Exception(
+#         "You need to follow the instructions marked TODO in this script before trying to use it"
+#     )
 
 
 def github_api_request(url: str) -> Union[List, Dict]:
+    headers = headers_function()
     response = requests.get(url, headers=headers)
     response_data = response.json()
+    
     if response.status_code != 200:
         raise Exception(
             f"Error response from github api! status code: {response.status_code}, "
@@ -75,7 +82,7 @@ def get_readme_download_url(files: List[Dict[str, str]]) -> str:
     for file in files:
         if file["name"].lower().startswith("readme"):
             return file["download_url"]
-    return ""
+    return "https://api.github.com/repos/wanghaisheng/healthcaredatastandard/contents/"
 
 
 def process_repo(repo: str) -> Dict[str, str]:
