@@ -11,7 +11,7 @@ import json
 from typing import Dict, List, Optional, Union, cast
 import requests
 
-from divante_env import github_token, github_username
+from env import github_token, github_username
 import divante_get_repos
 import get_repo_names
 import random

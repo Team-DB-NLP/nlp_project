@@ -103,15 +103,15 @@ def get_train(new_df):
     X_test = test['lemmatized']
     y_test = test.language
     X_bow, X_validate_bow, X_test_bow = get_bows(X_train, X_validate, X_test)
-    the_df = super_classification_model(new_df, X_bow,y_train, X_validate_bow, y_validate)
+    the_df = super_classification_model(new_df, X_bow,y_train, X_validate_bow, y_validate, X_test_bow)
 
     # (new_df, X_train,y_train, X_validate, y_validate, the_c = 1, neighbors = 20)
 
-    return the_df, X_test_bow, y_test
+    return the_df, X_test_bow, y_test, unseen_data(X_train, y_train, X_test, y_test)
     
 
 def get_dataframe():
-    new_df = pd.read_csv('giant_df')
+    new_df = pd.read_csv('giant_df.csv')
     new_df = prepare_data(new_df)
     new_df = do_everything(new_df)
     
@@ -139,7 +139,7 @@ def prepare_data(new_df):
     new_df = new_df.reset_index(drop=True)
     new_df = new_df.drop('Unnamed: 0', axis=1)
 
-    the_list = new_df.language.value_counts()[new_df.language.value_counts() < 7].index.tolist()
+    the_list = new_df.language.value_counts()[new_df.language.value_counts() < 35].index.tolist()
     the_dict = {}
     for i in the_list:
         the_dict[i] = 'other'
@@ -167,7 +167,7 @@ def do_everything(codeup_df):
     return codeup_df
 
 
-def super_classification_model(new_df, X_train,y_train, X_validate, y_validate, the_c = 1, neighbors = 20):
+def super_classification_model(new_df, X_train,y_train, X_validate, y_validate, X_test, the_c = 1, neighbors = 20):
     '''
     Runs classification models based on our best parameters and returns a pandas dataframe
     '''
@@ -255,9 +255,9 @@ def clean(text):
     # lemmatize() function from last lesson:
     # Initialize WordNet lemmatizer
     wnl = nltk.stem.WordNetLemmatizer()
-    
+    stopwords = ['1', '2']
     # Combine standard English stopwords with additional stopwords
-    stopwords = nltk.corpus.stopwords.words('english') 
+    stopwords = nltk.corpus.stopwords.words('english') + stopwords
     
     # Lemmatize words and remove stopwords
     cleaned_words = [wnl.lemmatize(word) for word in words if word not in stopwords]
@@ -325,6 +325,7 @@ def visual_two(word_counts):
     .sort_values(by='all')
     .drop(columns='all')
 
+
     .plot.barh(stacked=True, width=1, ec='black')
     )
 
@@ -341,3 +342,10 @@ def get_stats_test(train):
                     train['lem_len'][train['language'] == 'HTML'])
     
     return answer
+
+
+def unseen_data(X_train, y_train, X_test, y_test):
+    tree = DecisionTreeClassifier(random_state = 123,max_depth=6)
+    tree.fit(X_train, y_train)
+    test_predict = tree.score(X_test, y_test)
+    return test_predict

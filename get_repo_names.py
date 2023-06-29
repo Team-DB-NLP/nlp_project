@@ -15,14 +15,14 @@ def headers_function():
 
 
 def get_names_list():
-    url = 'https://github.com/search?q=healthcare&type=repositories&p=15'
+    url = 'https://github.com/search?q=healthcare&type=repositories'
     
     
     
     the_list_of_endings = []
-    for j in range(5):
+    for j in range(95):
         headers = {"User-Agent": headers_function()}
-        time.sleep(5)
+        time.sleep(30)
         response = get(url, headers = headers)
         soup = BeautifulSoup(response.content, 'html.parser')
 
