@@ -83,3 +83,7 @@ Models used:
 ## Next Steps
 
 *
+
+## Slides
+
+* You can access slides here: Natural [Language Presentation](https://www.canva.com/design/DAFnNOw_na4/wLeH2sSjtLYyse9zuMoHPA/edit?utm_content=DAFnNOw_na4&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
