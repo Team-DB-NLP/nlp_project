@@ -35,7 +35,7 @@ nlp project for codeup.
         * stemmed
         * lemmatized
 
-* Explore dataset for predictors of property value ('__')
+* Explore dataset for predictors of programming language.
     * Answer the following questions:
     * Do different programming languages (PL) use a different number of unique words?
     * Which bigram words occur the most in each PL?
@@ -66,6 +66,7 @@ nlp project for codeup.
 
 ## Takeaways and Conclusions
 Models used:
+
 * 
 
 * 
@@ -86,4 +87,4 @@ Models used:
 
 ## Slides
 
-* You can access slides here: Natural [Language Presentation](https://www.canva.com/design/DAFnNOw_na4/wLeH2sSjtLYyse9zuMoHPA/edit?utm_content=DAFnNOw_na4&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+* You can access presentation slides here: [Natural Language Presentation](https://www.canva.com/design/DAFnNOw_na4/wLeH2sSjtLYyse9zuMoHPA/edit?utm_content=DAFnNOw_na4&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
