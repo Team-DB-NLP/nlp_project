@@ -103,11 +103,11 @@ def get_train(new_df):
     X_test = test['lemmatized']
     y_test = test.language
     X_bow, X_validate_bow, X_test_bow = get_bows(X_train, X_validate, X_test)
-    the_df = super_classification_model(new_df, X_bow,y_train, X_validate_bow, y_validate, X_test_bow)
+    the_df , X_test_bow = super_classification_model(new_df, X_bow,y_train, X_validate_bow, y_validate, X_test_bow, y_test)
 
     # (new_df, X_train,y_train, X_validate, y_validate, the_c = 1, neighbors = 20)
 
-    return the_df, X_test_bow, y_test, unseen_data(X_train, y_train, X_test, y_test)
+    return the_df, X_test_bow, y_test
     
 
 def get_dataframe():
@@ -167,7 +167,7 @@ def do_everything(codeup_df):
     return codeup_df
 
 
-def super_classification_model(new_df, X_train,y_train, X_validate, y_validate, X_test, the_c = 1, neighbors = 20):
+def super_classification_model(new_df, X_train,y_train, X_validate, y_validate, X_test, y_test, the_c = 1, neighbors = 20):
     '''
     Runs classification models based on our best parameters and returns a pandas dataframe
     '''
@@ -206,8 +206,19 @@ def super_classification_model(new_df, X_train,y_train, X_validate, y_validate, 
     train_predict = tree.score(X_train, y_train)
     validate_predict = tree.score(X_validate, y_validate)
     the_df.loc[4] = ['DecisionTreeClassifier', str(round(train_predict, 3))[:5], str(round(validate_predict, 3))[:5]]    
+    test_predict = tree.score(X_test, y_test)
 
-    return the_df
+    baseline = len(new_df[new_df.language == 'other']) / len(new_df.index)
+
+    test_df = pd.DataFrame(data=[
+    {
+        'model_train':'baseline',
+        'train_predict':round(baseline,3),
+    }
+    ])
+    test_df.loc[4] = ['DecisionTreeClassifier', str(round(test_predict, 3))[:5]]
+
+    return the_df, test_df
 
 
 def chi2_test(train, columns_list):
@@ -255,7 +266,7 @@ def clean(text):
     # lemmatize() function from last lesson:
     # Initialize WordNet lemmatizer
     wnl = nltk.stem.WordNetLemmatizer()
-    stopwords = ['1', '2']
+    stopwords = ['1', '2', 'dataoriginalheight1600', 'dataoriginalwidth900']
     # Combine standard English stopwords with additional stopwords
     stopwords = nltk.corpus.stopwords.words('english') + stopwords
     
@@ -273,17 +284,11 @@ def all_words_function(new_df):
     JavaScript_words = clean(' '.join(df[df.language=="JavaScript"]['lemmatized']))
     HTML_words = clean(' '.join(df[df.language=="HTML"]['lemmatized']))
 
-
-
-
-
-
     other_words_freq = pd.Series(other_words).value_counts()
     Python_words_freq = pd.Series(Python_words).value_counts()
     Java_words_freq = pd.Series(Java_words).value_counts()
     JavaScript_words_freq = pd.Series(JavaScript_words).value_counts()
     HTML_words_freq = pd.Series(HTML_words).value_counts()
-
 
     other_words_df = pd.DataFrame(other_words_freq)
     Python_words_df = pd.DataFrame(Python_words_freq)
