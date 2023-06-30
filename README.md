@@ -1,4 +1,4 @@
-# team_db nlp_project
+# team_db Programming Language Project
 nlp project for codeup.
 
 ## Project Description
@@ -26,7 +26,7 @@ nlp project for codeup.
 * Acquire and join GitHub repositories containing healthcare content.
 
 * Prepare the data using the following columns:
-    * target: 
+    * target: language
     * features:
         * repo
         * language
@@ -40,7 +40,7 @@ nlp project for codeup.
     * Do different programming languages (PL) use a different number of unique words?
     * Which bigram words occur the most in each PL?
     * Which trigram words occur the most in each PL?
-    * What is the percentage of each PL for the most common ('all') 20 words?
+    * Are there differences in % of each programming language for the most common 20 words?
 
 * Develop a model
     * Using the selected data features develop appropriate predictive models
@@ -65,25 +65,33 @@ nlp project for codeup.
 3) Run notebook
 
 ## Takeaways and Conclusions
-Models used:
+Models used: KNeighbors, Logistics Regression, Random Forest, Decision Tree
+* Bigrams
+    * 'Deep and learning' show up the most in python readme's
+    * 'Mirth and connect' show up the most in java readme's 
+    * 'Required and field' , missing and required show up most in javascript readme's
+* Trigrams
+    * There is a tie for first for words or tags that influence the models descision in choosing if a readme is python
+    * There is a tie for the words or tags that influence the model most when choosing the java language 
+    * Missing, required, and field influence when the model is choosing javascript
+    
+* Different unique words according to bargraph.
 
-* 
+* Yes there are clear indications of differences and certain words are used more often in particular programming languages.
+    * Model and br are used most frequently in Python
+    * In JavaScript they use Server frequently in JavaScript
 
-* 
-* 
-* 
-* 
-
+* The DecisionTreeClassifier with a max depth of 6 outperformed all of our other models
+* The DecisionTreeClassifier ran on our test data beat baseline by ~11%
 
 ## Recommendations
-* 
-* 
-* 
-* 
+* Use the model moving forward.
 
 ## Next Steps
 
-*
+* Create more models to try and get a higher prediction score.
+* Make quadgrams to send through the model.
+* Take out some of the tags that are possibly run in the background and clearly visible on the README.
 
 ## Slides
 
